@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IsoViewer</title>
+<!-- __STYLE__ -->
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-brand"><span class="bc">BaseCode</span> <span class="iso">IsoViewer</span></div>
+    <div class="boot-sub">Diving into transcriptomic data</div>
+    <div class="iso-wrap" id="boot-iso" aria-hidden="true">
+      <div class="iso-rows" id="boot-iso-rows"></div>
+    </div>
+    <div class="boot-status"><span id="boot-status">Decoding report data…</span></div>
+  </div>
+</div>
+
+<div id="app">
+
+  <aside id="sidebar">
+    <div class="brand-area">
+      <div class="brand-title"><span class="bc">BaseCode</span><span class="iso">IsoViewer</span></div>
+    </div>
+    <nav id="nav" aria-label="Report sections"></nav>
+    <div class="sidebar-foot">
+      <a class="brand-logo" href="https://www.basic-genomics.com" target="_blank"
+         rel="noopener" aria-label="Basic Genomics"><!-- __LOGO__ --></a>
+      <div class="foot-meta">
+        <span id="foot-version"></span>
+        <a class="foot-link" href="https://basecode.readthedocs.io/en/latest/"
+           target="_blank" rel="noopener">Read the docs →</a>
+      </div>
+    </div>
+  </aside>
+
+  <main id="main">
+    <header id="header">
+      <h1 id="page-title">IsoViewer</h1>
+      <div id="header-controls" style="display:flex;align-items:center;gap:var(--sp-3);flex:1;min-width:0"></div>
+    </header>
+    <div id="content"></div>
+  </main>
+
+</div>
+
+<!-- __BLOCKS__ -->
+<!-- __SCRIPT__ -->
+</body>
+</html>

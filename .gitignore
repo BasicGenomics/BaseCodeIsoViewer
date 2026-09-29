@@ -1,0 +1,10 @@
+reports/
+*.html
+!web/index.html
+
+.cache/
+
+__pycache__/
+*.pyc
+._*
+.DS_Store

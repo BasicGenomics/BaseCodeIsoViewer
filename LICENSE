@@ -1,0 +1,23 @@
+Copyright (c) 2026 Basic Genomics AB. All rights reserved.
+
+This software, including its source code, documentation and any reports it
+produces as part of the software, is proprietary to Basic Genomics AB.
+
+No permission is granted to use, copy, modify, merge, publish, distribute,
+sublicense or sell this software, in whole or in part, without prior written
+permission from Basic Genomics AB. Viewing the source code does not grant any
+licence to it.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL BASIC GENOMICS AB BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.
+
+Third-party components
+
+The following files are not covered by the terms above and remain under their
+own licences:
+
+  web/vendor/plotly.min.js   plotly.js, Copyright Plotly, Inc., MIT licence
+  web/vendor/d3.min.js       D3, Copyright Mike Bostock, ISC licence
+  web/assets/fonts/          Mona Sans, SIL Open Font License 1.1
+                             (see web/assets/fonts/mona-sans-OFL.txt)
