@@ -8,3 +8,6 @@ __pycache__/
 *.pyc
 ._*
 .DS_Store
+.venv/
+tools/
+test.html

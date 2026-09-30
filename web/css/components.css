@@ -385,7 +385,7 @@ table.dt.compact th, table.dt.compact td { padding: 4px 8px; }
 .pl-plot .modebar-group { background: transparent !important; }
 
 .pl-plot .hoverlayer .hovertext { filter: none !important; }
-.pl-plot .hoverlayer .hovertext path { stroke: var(--border) !important; }
+.pl-plot .hoverlayer .hovertext path { stroke-width: 2px !important; }
 
 .chart svg { display: block; width: 100%; overflow: visible; }
 .chart canvas { display: block; width: 100%; }

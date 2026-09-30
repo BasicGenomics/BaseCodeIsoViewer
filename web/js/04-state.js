@@ -126,6 +126,10 @@
     "Averaged over samples from the quantified values, so it counts only the "
     + "molecules quantification counted - not every molecule assigned here.";
 
+  const TOTAL_COUNTED_NOTE =
+    "Summed over the selected samples from the quantified values, so it counts "
+  + "only the molecules quantification counted - not every molecule assigned here.";
+
   const TERMS = [
     { term: "Detected molecules",
       body: "Molecules assigned to a feature, showing evidence that it was "
@@ -925,7 +929,7 @@
     MODES, STRINGENCY, VALUE_MODE,
     on, emit, modeInfo, valueInfo, stringencyInfo,
     valueColumn, valueLabel, valueLabelCap, valueUnit, fmtValue,
-    meanValuePhrase, meanValueShort, COUNTED_NOTE, TERMS,
+    meanValuePhrase, meanValueShort, COUNTED_NOTE, TOTAL_COUNTED_NOTE, TERMS,
     universe, structOf, derive,
     setMode, setValueMode, setStringency, setUniverse, setWeight,
     initTheme, cycleTheme, applyTheme,
