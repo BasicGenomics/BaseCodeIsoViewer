@@ -134,7 +134,7 @@
             text: IV.blocks.cell(gChr, gi[i]) });
         } } : null,
       { key: "counted", label: "Counted molecules", align: "right",
-        help: S.COUNTED_NOTE,
+        help: S.TOTAL_COUNTED_NOTE,
         value: function (i) { return S.totalCounts(t, i); },
         render: function (i) { return F.int(Math.round(S.totalCounts(t, i))); } },
       { key: "meanMol", label: "Mean counted molecules per sample", align: "right",

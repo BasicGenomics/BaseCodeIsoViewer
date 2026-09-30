@@ -89,7 +89,7 @@
           return el("span", { class: "small muted", text: IV.blocks.cell(chr, i) });
         } },
       { key: "counted", label: "Counted molecules", align: "right",
-        help: S.COUNTED_NOTE,
+        help: S.TOTAL_COUNTED_NOTE,
         value: function (i) { return S.totalCounts(g, i); },
         render: function (i) { return F.int(Math.round(S.totalCounts(g, i))); } },
       { key: "meanMol", label: "Mean counted molecules per sample", align: "right",

@@ -204,6 +204,19 @@
 
   const GL_MIN = 25000;
 
+  function hoverBorderColor(spec, n, dotColor) {
+    if (!spec.hoverBorder) return dotColor;
+
+    const borders = new Array(n);
+    const isArray = Array.isArray(dotColor);
+    for (let i = 0; i < n; i++) {
+      borders[i] = (spec.hoverBorder[i]) || (isArray ? dotColor[i] : dotColor);
+    }
+    return borders;
+  }
+
+
+
   function points(host, spec, o) {
     if (!available()) return false;
     const opts = o || {};
@@ -218,6 +231,7 @@
     };
     const xs = clampLog(spec.x, logAx(opts.xaxis));
     const ys = clampLog(spec.y, logAx(opts.yaxis));
+    const dotColor = spec.color || opts.color || t.brand;
     const trace = {
       type: n > GL_MIN ? "scattergl" : "scatter",
       mode: spec.text ? "markers+text" : "markers",
@@ -226,25 +240,26 @@
       text: spec.text || null,
       textposition: spec.textposition || "top center",
       textfont: spec.text ? { size: 10.5, color: t.ink } : undefined,
+      
       marker: {
         size: opts.markerSize || (n > 20000 ? 3 : n > 5000 ? 4 : 6),
-        color: spec.color || opts.color || t.brand,
+        color: dotColor,
         opacity: opts.opacity == null ? (n > 20000 ? 0.55 : 0.8) : opts.opacity,
         line: { width: 0 },
       },
       hovertext: spec.hover,
       hoverinfo: "text",
       hovertemplate: "%{hovertext}<extra></extra>",
-      hoverlabel: (spec.hoverBg || spec.hoverFg) ? {
+      hoverlabel: {
         bgcolor: spec.hoverBg || undefined,
-        bordercolor: spec.hoverBorder || undefined,
+        bordercolor: hoverBorderColor(spec, n, dotColor),
         font: spec.hoverFg ? { family: FONT, size: 11.5, color: spec.hoverFg }
                            : undefined,
         align: "left",
-      } : undefined,
+      },
     };
     const traces = [trace];
-
+    const highlightColor = opts.highlightColor || t.accent;
     if (spec.highlight && spec.highlight.length) {
       traces.push({
         type: "scatter",
@@ -261,12 +276,16 @@
         textfont: { size: 10, color: t.ink },
         marker: {
           size: 10,
-          color: opts.highlightColor || t.accent,
+          color: highlightColor,
           line: { width: 1.5, color: t.surface },
         },
         hovertext: spec.highlight.map(function (i) { return spec.hover[i]; }),
         hoverinfo: "text",
         hovertemplate: "%{hovertext}<extra></extra>",
+        hoverlabel: {
+          bordercolor: highlightColor,
+          align: "left",
+        },
       });
     }
 

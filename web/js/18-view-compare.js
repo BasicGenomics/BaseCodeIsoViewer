@@ -494,7 +494,7 @@
         xTitle: "Mean " + unit + " + 1 in B (log)",
         yTitle: "Mean " + unit + " + 1 in A (log)",
         exportName: "group-means",
-        xaxis: { type: "log", tickformat: ".2s" },
+        xaxis: { type: "log", tickformat: ".2s", constrain: "domain" },
         yaxis: { type: "log", tickformat: ".2s",
                  scaleanchor: "x", scaleratio: 1 },
         shapes: [{
