@@ -91,6 +91,7 @@
     view: "overview",
     viewArg: null,
     samples: [],
+    sampleLabels: { labels: [], aliased: false },
     sampleOn: [],
     group: [],
     geneTabs: [],
@@ -925,6 +926,24 @@
     emit("samples");
   }
 
+  function sampleAliasKey(indices) {
+    const sl = state.sampleLabels;
+    if (!sl || !sl.aliased) return null;
+    return indices.map(function (i) {
+      return {
+        alias: sl.labels[i],
+        full: String(state.samples[i] == null ? "" : state.samples[i]),
+      };
+    });
+  }
+
+  function sampleTipName(i) {
+    const full = String(state.samples[i] == null ? "" : state.samples[i]);
+    const sl = state.sampleLabels;
+    if (!sl || !sl.aliased) return full;
+    return sl.labels[i] + " · " + full;
+  }
+
   IV.stateApi = {
     MODES, STRINGENCY, VALUE_MODE,
     on, emit, modeInfo, valueInfo, stringencyInfo,
@@ -943,6 +962,6 @@
     activeIdx, nActive, allSamplesOn, ensureSampleOn,
     setSampleOn, setAllSamples, setSampleSet,
     weightLabel, weightLabelCap, universeLabel, qcSlice, assignTotals,
-    pushGeneTab, closeGeneTab,
+    pushGeneTab, closeGeneTab, sampleAliasKey, sampleTipName,
   };
 })(window.IV);

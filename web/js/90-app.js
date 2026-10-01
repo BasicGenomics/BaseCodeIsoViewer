@@ -524,6 +524,7 @@
       const core = await IV.blocks.load("core");
       IV.state.core = core;
       IV.state.samples = core.samples || [];
+      IV.state.sampleLabels = IV.chart.sampleAliases(IV.state.samples);
       IV.state.sampleOn = IV.state.samples.map(function () { return true; });
       IV.state.group = IV.state.samples.map(function (_, i) {
         return IV.state.samples.length === 2 ? (i === 0 ? 1 : 2) : 0;

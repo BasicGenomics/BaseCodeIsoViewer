@@ -655,6 +655,64 @@
     return { x: x, y: y, frame: fr };
   }
 
+  function sampleAliases(names, maxLen = 14) {
+    let longestName = 0;
+    names = names || [];
+    for (let i = 0; i < names.length; i++) {
+      const L = String(names[i] == null ? "" : names[i]).length;
+      if (L > longestName) longestName = L;
+    }
+    if (longestName <= maxLen) return {labels: names.slice(), aliased: false};
+
+    const existingNames = new Set();
+
+    for (let i = 0; i < names.length; i++) {
+      const name = String(names[i] == null ? "" : names[i]);
+      existingNames.add(name); 
+    }
+
+    const n = names.length;
+    const width = String(n).length;
+    const CANDIDATE_PREFIXES = ['S', '#', 'Sample_', 'Smp_'];
+
+    for (const prefix of CANDIDATE_PREFIXES) {
+      const labels = [];
+      let clashes = false;
+      for (let i = 0; i < names.length; i++) {
+        const alias = prefix + String(i + 1).padStart(width, '0');
+        if (existingNames.has(alias)) {
+          clashes = true;
+          break;
+        }
+        labels.push(alias);
+      }
+      if (!clashes) return { labels: labels, aliased: true };
+    }
+
+    // Every prefix clashed (very unlikely): fall back to the last prefix plus "_".
+    const fallback = CANDIDATE_PREFIXES[CANDIDATE_PREFIXES.length - 1] + '_';
+    return {
+      labels: names.map(function (_, i) {
+        return fallback + String(i + 1).padStart(width, '0');
+      }),
+      aliased: true,
+    };
+  }
+
+  function aliasKeyPanel(entries, topPad) {
+    const panel = el("div", { class: "hm-alias-key",
+      style: { marginTop: topPad + "px" } });
+    panel.appendChild(el("div", { class: "hm-alias-key-title", text: "Sample key" }));
+    const grid = el("div", { class: "hm-alias-key-grid" });
+    for (const k of entries) {
+      grid.appendChild(el("span", { class: "hm-alias-key-alias", text: k.alias }));
+      grid.appendChild(el("span", { class: "hm-alias-key-full", text: k.full,
+        title: k.full }));
+    }
+    panel.appendChild(grid);
+    return panel;
+  }
+
   function heatmap(host, opts) {
     clear(host);
     const o = opts;
@@ -665,23 +723,50 @@
     }
     const cellW = o.cellW || Math.max(8, Math.min(46, 620 / nc));
     const cellH = o.cellH || Math.max(3, Math.min(18, 620 / nr));
-    const labelW = o.labelW || 132;
+    
     let widestCol = 0;
     for (let c = 0; c < nc; c++) {
       const L = String(o.cols[c] == null ? "" : o.cols[c]).length;
       if (L > widestCol) widestCol = L;
     }
+
+    let widestRow = 0;
+    for (let r = 0; r < nr; r++) {
+      const L = String(o.rows[r] == null ? "" : o.rows[r]).length;
+      if (L > widestRow) widestRow = L;
+    }
     const COL_PX_PER_CHAR = 6.4;
+    const labelW = Math.max(o.labelW || 132, widestRow * COL_PX_PER_CHAR + 14);
+    const MAX_VERTICAL_HEAD = 80;
+    const DIAG_FACTOR = Math.SQRT1_2;
     const colTextW = widestCol * COL_PX_PER_CHAR;
-    const rotate = colTextW + 6 > cellW;
+    const labelMode = colTextW + 6 < cellW ? '0': (colTextW + 14) <= MAX_VERTICAL_HEAD ? '-90' : '-45';
     const BAND_H = 7;
     const bandSpace = (o.colBand && o.colBand.length) ? BAND_H + 13 : 0;
-    const headH = (o.headH || (rotate ? Math.min(160, Math.max(56, colTextW + 14)) : 56))
+    const headH = Math.max(o.headH || 0, (labelMode === '0' ? 32 : labelMode === '-90' ? colTextW + 14 : DIAG_FACTOR * colTextW + 14))
       + bandSpace;
+    const rightPad = Math.max(16, (labelMode === '-45' ? DIAG_FACTOR * colTextW - cellW / 2 : 0));
     const w = nc * cellW, h = nr * cellH;
 
+    // Sample alias key (Step 4): only drawn when the caller passed one.
+    const aliasKey = (o.aliasKey && o.aliasKey.length) ? o.aliasKey : null;
+    const KEY_GAP = 16, KEY_COL_GAP = 8, KEY_LINE_H = 14, KEY_TITLE_H = 18;
+    let keyAliasW = 0, keyW = 0, keyH = 0;
+    if (aliasKey) {
+      let aliasChars = 0, fullChars = "Sample key".length;
+      for (const k of aliasKey) {
+        aliasChars = Math.max(aliasChars, String(k.alias == null ? "" : k.alias).length);
+        fullChars = Math.max(fullChars, String(k.full == null ? "" : k.full).length);
+      }
+      keyAliasW = aliasChars * COL_PX_PER_CHAR + KEY_COL_GAP;
+      keyW = keyAliasW + fullChars * COL_PX_PER_CHAR;
+      keyH = KEY_TITLE_H + aliasKey.length * KEY_LINE_H;
+    }
+
     function exportSVG() {
-      const W = labelW + w + 16, H = headH + h + 6;
+      const keyX = labelW + w + rightPad + KEY_GAP;
+      const W = Math.ceil(aliasKey ? keyX + keyW + 8 : labelW + w + rightPad);
+      const H = Math.ceil(Math.max(headH + h + 6, aliasKey ? headH + keyH + 6 : 0));
       const esc = function (t) {
         return String(t == null ? "" : t)
           .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -696,11 +781,13 @@
       for (let c = 0; c < nc; c++) {
         const cx = labelW + c * cellW + cellW / 2, cy = headH - 6 - bandSpace;
         out.push('<text x="' + cx.toFixed(1) + '" y="' + cy.toFixed(1) + '"'
-          + ' text-anchor="' + (rotate ? "start" : "middle") + '"'
-          + (rotate ? ' transform="rotate(-90 ' + cx.toFixed(1) + ' '
+          + ' text-anchor="' + (labelMode === '0' ? "middle" : "start" ) + '"'
+          + (labelMode !== '0' ? ' transform="rotate(' + labelMode + ' ' + cx.toFixed(1) + ' '
               + cy.toFixed(1) + ')"' : "")
+          + (labelMode !== '0' ? ' dominant-baseline="central"' : "")
           + '>' + esc(o.cols[c]) + '</text>');
       }
+      
       out.push('</g>');
       if (o.colBand && o.colBand.length) {
         const bandH = BAND_H;
@@ -735,7 +822,21 @@
           + (headH + r * cellH + cellH / 2 + fs * 0.36).toFixed(1) + '">'
           + esc(o.rows[r]) + '</text>');
       }
-      out.push('</g></svg>');
+      out.push('</g>');
+      if (aliasKey) {
+        out.push('<g ' + fnt + ' font-size="10" fill="' + ink + '">');
+        out.push('<text x="' + keyX.toFixed(1) + '" y="' + (headH + 10).toFixed(1)
+          + '" font-weight="bold">Sample key</text>');
+        aliasKey.forEach(function (k, i) {
+          const y = (headH + KEY_TITLE_H + i * KEY_LINE_H + 10).toFixed(1);
+          out.push('<text x="' + keyX.toFixed(1) + '" y="' + y + '" font-weight="bold">'
+            + esc(k.alias) + '</text>');
+          out.push('<text x="' + (keyX + keyAliasW).toFixed(1) + '" y="' + y + '">'
+            + esc(k.full) + '</text>');
+        });
+        out.push('</g>');
+      }
+      out.push('</svg>');
       IV.dom.download((o.exportName || "heatmap") + ".svg", out.join(""),
         "image/svg+xml;charset=utf-8");
     }
@@ -749,24 +850,34 @@
 
     const shell = el("div", { style: { position: "relative", overflowX: "auto" } });
     const inner = el("div", { style: { position: "relative",
-      width: (labelW + w + 16) + "px", height: (headH + h + 6) + "px" } });
+      width: (labelW + w + rightPad) + "px", height: (headH + h + 6) + "px" } });
     shell.appendChild(inner);
-    host.appendChild(shell);
+    if (aliasKey) {
+      shell.style.flex = "0 1 auto";
+      shell.style.minWidth = "0";
+      const row = el("div", { class: "hm-key-row" });
+      row.appendChild(shell);
+      row.appendChild(aliasKeyPanel(aliasKey, headH));
+      host.appendChild(row);
+    } else {
+      host.appendChild(shell);
+    }
 
-    const hd = svgEl("svg", { width: labelW + w + 16, height: headH,
+    const hd = svgEl("svg", { width: labelW + w + rightPad, height: headH,
       style: "position:absolute;left:0;top:0;overflow:visible" });
     for (let c = 0; c < nc; c++) {
       const cx = labelW + c * cellW + cellW / 2;
       const cy = headH - 6 - bandSpace;
       const t = svgEl("text", { class: "tick-text", x: cx, y: cy,
-        "text-anchor": rotate ? "start" : "middle" });
-      if (rotate) {
-        t.setAttribute("transform", "rotate(-90 " + cx + " " + cy + ")");
+        "text-anchor": labelMode === '0' ? "middle" : "start" });
+      if (labelMode !== '0') {
+        t.setAttribute("transform", 'rotate(' + labelMode + ' ' + cx + ' ' + cy + ')');
         t.setAttribute("dominant-baseline", "central");
       }
       t.textContent = o.cols[c];
       hd.appendChild(t);
     }
+
     if (o.colBand && o.colBand.length) {
       const bandH = BAND_H;
       for (let c = 0; c < nc; c++) {
@@ -1159,7 +1270,7 @@
     colorBar,
     frame, linear, ticks, fmtTick, xAxis, yAxis, barPath,
     histogram, barsH, stackBar, stackGroups, legend,
-    scatter, heatmap, ranked, track, sparkBars, ternary,
+    scatter, sampleAliases, heatmap, ranked, track, sparkBars, ternary,
     showTip, hideTip, moveTip, tipHTML, bindHover, GAP, R,
   };
 })(window.IV);

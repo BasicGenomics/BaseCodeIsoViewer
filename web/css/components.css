@@ -928,6 +928,21 @@ details.disclose > div { padding-top: var(--sp-2); }
 }
 .hm-row-label:hover, .dock-label:hover { cursor: pointer; }
 
+.hm-key-row {
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--sp-4);
+}
+.hm-alias-key {
+  max-width: 280px; font-family: var(--font);
+  font-size: var(--fs-xs); color: var(--ink-2);
+}
+.hm-alias-key-title { font-weight: 700; color: var(--ink); margin-bottom: var(--sp-1); }
+.hm-alias-key-grid {
+  display: grid; grid-template-columns: auto 1fr;
+  column-gap: var(--sp-2); row-gap: 2px;
+}
+.hm-alias-key-alias { font-weight: 700; font-variant-numeric: tabular-nums; }
+.hm-alias-key-full { overflow-wrap: anywhere; }
+
 .terms {
   margin: var(--sp-2) 0 var(--sp-4);
   border: 1px solid var(--border); border-radius: var(--r-md);

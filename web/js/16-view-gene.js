@@ -1016,7 +1016,8 @@
         rows: kept.map(function (i) {
           return IV.blocks.cell(names, i) || IV.blocks.cell(ids, i);
         }),
-        cols: core.samples,
+        cols: IV.state.sampleLabels.labels,
+        aliasKey: IV.stateApi.sampleAliasKey(active),
         cellW: Math.max(34, Math.min(70, 420 / nS)),
         cellH: Math.max(13, Math.min(22, 400 / kept.length)),
         labelW: 190, headH: nS > 6 ? 62 : 32,
@@ -1032,7 +1033,7 @@
           const i = kept[r];
           return IV.chart.tipHTML(
             IV.blocks.cell(names, i) || IV.blocks.cell(ids, i), [
-              ["Sample", core.samples[cc]],
+              ["Sample", IV.stateApi.sampleTipName(cols[cc])],
               [unitOf(vs, "vmHeat") === "tpm" ? "TPM" : "Molecules",
                unitOf(vs, "vmHeat") === "tpm"
                  ? F.dec(vm.get(i, cc), 2) : F.int(vm.get(i, cc))],

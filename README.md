@@ -18,7 +18,7 @@ IsoQuant results inside (`results/isoquant`) by itself:
 
 ```bash
 cd /path/to/run/BaseCode
-PYTHONPATH=/path/to/BaseCodeIsoViewer python3 -m isoviewer build .
+ python3 -m isoviewer build .
 ```
 
 This writes `<run>_isoviewer_v<version>.html` into the current folder; add
