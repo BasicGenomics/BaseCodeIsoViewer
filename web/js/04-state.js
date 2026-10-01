@@ -91,6 +91,7 @@
     view: "overview",
     viewArg: null,
     samples: [],
+    sampleLabels: { labels: [], aliased: false },
     sampleOn: [],
     group: [],
     geneTabs: [],
@@ -125,6 +126,10 @@
   const COUNTED_NOTE =
     "Averaged over samples from the quantified values, so it counts only the "
     + "molecules quantification counted - not every molecule assigned here.";
+
+  const TOTAL_COUNTED_NOTE =
+    "Summed over the selected samples from the quantified values, so it counts "
+  + "only the molecules quantification counted - not every molecule assigned here.";
 
   const TERMS = [
     { term: "Detected molecules",
@@ -921,11 +926,29 @@
     emit("samples");
   }
 
+  function sampleAliasKey(indices) {
+    const sl = state.sampleLabels;
+    if (!sl || !sl.aliased) return null;
+    return indices.map(function (i) {
+      return {
+        alias: sl.labels[i],
+        full: String(state.samples[i] == null ? "" : state.samples[i]),
+      };
+    });
+  }
+
+  function sampleTipName(i) {
+    const full = String(state.samples[i] == null ? "" : state.samples[i]);
+    const sl = state.sampleLabels;
+    if (!sl || !sl.aliased) return full;
+    return sl.labels[i] + " · " + full;
+  }
+
   IV.stateApi = {
     MODES, STRINGENCY, VALUE_MODE,
     on, emit, modeInfo, valueInfo, stringencyInfo,
     valueColumn, valueLabel, valueLabelCap, valueUnit, fmtValue,
-    meanValuePhrase, meanValueShort, COUNTED_NOTE, TERMS,
+    meanValuePhrase, meanValueShort, COUNTED_NOTE, TOTAL_COUNTED_NOTE, TERMS,
     universe, structOf, derive,
     setMode, setValueMode, setStringency, setUniverse, setWeight,
     initTheme, cycleTheme, applyTheme,
@@ -939,6 +962,6 @@
     activeIdx, nActive, allSamplesOn, ensureSampleOn,
     setSampleOn, setAllSamples, setSampleSet,
     weightLabel, weightLabelCap, universeLabel, qcSlice, assignTotals,
-    pushGeneTab, closeGeneTab,
+    pushGeneTab, closeGeneTab, sampleAliasKey, sampleTipName,
   };
 })(window.IV);

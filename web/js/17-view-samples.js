@@ -282,6 +282,7 @@
             "between samples.",
     });
     const holder = el("div");
+    const lab = IV.state.sampleLabels.labels;
     function draw() {
       clear(holder);
       const idx = sv.corrMode === "hvg" ? M.hvg : M.order;
@@ -290,16 +291,17 @@
       for (const rr of m) for (const x of rr) if (x < lo) lo = x;
       IV.chart.heatmap(holder, {
         exportName: "sample-correlation",
-        rows: active.map(function (i) { return core.samples[i]; }),
-        cols: active.map(function (i) { return core.samples[i]; }),
+        rows: active.map(function (i) { return lab[i]; }),
+        cols: active.map(function (i) { return lab[i]; }),
+        aliasKey: IV.stateApi.sampleAliasKey(active),
         cellW: Math.max(30, Math.min(60, 380 / M.nS)),
         cellH: Math.max(20, Math.min(42, 320 / M.nS)),
         labelW: 118, headH: M.nS > 6 ? 64 : 32,
         get: function (r, cc) { return m[r][cc]; },
         scale: function (v) { return IV.pal.sequential(Math.max(0, Math.min(1, v))); },
         tip: function (r, cc) {
-          return IV.chart.tipHTML(core.samples[active[r]] + " vs "
-            + core.samples[active[cc]], [["Pearson r", F.dec(m[r][cc], 4)],
+          return IV.chart.tipHTML(IV.stateApi.sampleTipName(active[r]) + 
+          " vs " + IV.stateApi.sampleTipName(active[cc]), [["Pearson r", F.dec(m[r][cc], 4)],
             ["Features", F.int(idx.length)]]);
         },
       });
@@ -656,7 +658,8 @@
           const i = M.rows[feat[r]];
           return IV.blocks.cell(names, i) || IV.blocks.cell(ids, i);
         }),
-        cols: colOrder.map(function (j) { return core.samples[active[j]]; }),
+        cols: colOrder.map(function (j) { return IV.state.sampleLabels.labels[active[j]]; }),
+        aliasKey: IV.stateApi.sampleAliasKey(active),
         cellW: Math.max(30, Math.min(64, 420 / nS)),
         cellH: Math.max(2.4, Math.min(16, 2400 / rowOrder.length)),
         labelW: 196, headH: nS > 6 ? 62 : 32, alwaysLabelRows: true,
@@ -666,7 +669,7 @@
           const i = M.rows[feat[rowOrder[r]]];
           return IV.chart.tipHTML(
             IV.blocks.cell(names, i) || IV.blocks.cell(ids, i), [
-              ["Sample", core.samples[active[colOrder[cc]]]],
+              ["Sample", IV.stateApi.sampleTipName(active[colOrder[cc]])],
               ["Row-centred log₂", F.dec(Z[rowOrder[r]][colOrder[cc]], 3)],
               [basisLabel(), IV.stateApi.fmtValue(
                 M.frame.col(IV.stateApi.valueColumn()).get(i, active[colOrder[cc]]))],

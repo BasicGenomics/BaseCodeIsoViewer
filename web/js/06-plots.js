@@ -356,7 +356,7 @@
           const dim = !!o.dimOf(sorted[i]);
           hbg[i] = dim ? token("--surface-sunk") : T.surface;
           hfg[i] = dim ? token("--ink-faint") : T.ink;
-          hbd[i] = dim ? token("--border") : T.border;
+          hbd[i] = dim ? token("--border") : null;
         }
       }
       const drew = IV.px.points(host, {

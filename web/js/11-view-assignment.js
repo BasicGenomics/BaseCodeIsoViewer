@@ -747,6 +747,10 @@
           xTitle: "Molecule length (bp)",
           yTitle: "% of molecules",
           exportName: "molecule-length",
+          xaxis: {
+          tickvals: [0, 1000, 2000, 3000, 4000, 5000],
+          ticktext: ["0", "1 kb", "2 kb", "3 kb", "4 kb", "≥5 kb"]
+          },
         });
       }
       if (!drew) {

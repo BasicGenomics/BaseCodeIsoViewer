@@ -294,7 +294,8 @@
         rows: rowOrder.map(function (rr) {
           return IV.blocks.cell(r.names, feat[rr]);
         }),
-        cols: cols.map(function (j) { return core.samples[j]; }),
+        cols: cols.map(function (j) { return IV.state.sampleLabels.labels[j]; }),
+        aliasKey: IV.stateApi.sampleAliasKey(cols),
         colBand: cols.map(function (j, x) {
           const g = x < r.A.length ? "A" : "B";
           return { color: groupColor(g), label: "Group " + g };
@@ -307,7 +308,7 @@
         tip: function (rr, cc) {
           const i = feat[rowOrder[rr]];
           return IV.chart.tipHTML(IV.blocks.cell(r.names, i), [
-            ["Sample", core.samples[cols[cc]]],
+            ["Sample", IV.stateApi.sampleTipName(cc)],
             ["Group", cc < r.A.length ? "A" : "B"],
             ["Row-centred log₂", F.dec(Z[rowOrder[rr]][cc], 3)],
             [basisLabel(), IV.stateApi.fmtValue(vm.get(i, cols[cc]))],
@@ -494,7 +495,7 @@
         xTitle: "Mean " + unit + " + 1 in B (log)",
         yTitle: "Mean " + unit + " + 1 in A (log)",
         exportName: "group-means",
-        xaxis: { type: "log", tickformat: ".2s" },
+        xaxis: { type: "log", tickformat: ".2s", constrain: "domain" },
         yaxis: { type: "log", tickformat: ".2s",
                  scaleanchor: "x", scaleratio: 1 },
         shapes: [{
